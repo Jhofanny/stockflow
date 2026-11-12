@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111d3d">
+  <meta name="description" content="StockFlow — aplikasi inventaris toko dengan Flask dan PostgreSQL.">
+  <title>{{ title }} | StockFlow</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/logo.svg') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
+  {% block extra_head %}{% endblock %}
+  <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+</head>
+<body class="{{ 'auth-page' if not user else 'app-page' }}">
+{% if user %}
+<div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar" aria-label="Menu utama">
+    <a class="brand" href="{{ url_for('dashboard') }}">
+      <img src="{{ url_for('static', filename='img/logo.svg') }}" width="38" height="38" alt="">
+      <span>Stock<span>Flow</span></span>
+    </a>
+    <div class="sidebar-group-label">MENU UTAMA</div>
+    <nav class="side-nav" aria-label="Navigasi utama">
+      <a class="nav-link {{ 'active' if active == 'dashboard' else '' }}" href="{{ url_for('dashboard') }}"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+      <a class="nav-link {{ 'active' if active == 'products' else '' }}" href="{{ url_for('products') }}"><i data-lucide="package"></i> Produk</a>
+      <a class="nav-link {{ 'active' if active == 'categories' else '' }}" href="{{ url_for('categories') }}"><i data-lucide="layers-3"></i> Kategori</a>
+    </nav>
+    <div class="sidebar-group-label sidebar-second">INVENTARIS</div>
+    <nav class="side-nav" aria-label="Navigasi stok">
+      <a class="nav-link {{ 'active' if active == 'stock-in' else '' }}" href="{{ url_for('stock_form', kind='in') }}"><i data-lucide="package-plus"></i> Stok Masuk</a>
+      <a class="nav-link {{ 'active' if active == 'stock-out' else '' }}" href="{{ url_for('stock_form', kind='out') }}"><i data-lucide="package-minus"></i> Stok Keluar</a>
+      <a class="nav-link {{ 'active' if active == 'movements' else '' }}" href="{{ url_for('movements') }}"><i data-lucide="arrow-left-right"></i> Transaksi</a>
+      <a class="nav-link {{ 'active' if active == 'reports' else '' }}" href="{{ url_for('reports') }}"><i data-lucide="chart-column-increasing"></i> Laporan</a>
+    </nav>
+    <div class="sidebar-grow"></div>
+    <div class="sidebar-promo">
+      <div class="promo-symbol"><i data-lucide="rocket"></i></div>
+      <strong>Kelola stok lebih cerdas.</strong>
+      <p>Satu dashboard untuk inventaris yang lebih tertata.</p>
+      <span>STOCKFLOW v1.0</span>
+    </div>
+    <div class="sidebar-bottom"><span class="online-dot"></span> Demo workspace</div>
+  </aside>
+  <div class="main-panel">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button type="button" class="icon-button mobile-menu" id="menuToggle" aria-label="Buka menu" aria-expanded="false"><i data-lucide="menu"></i></button>
+        <form class="top-search" action="{{ url_for('products') }}" method="get" role="search">
+          <i data-lucide="search"></i>
+          <input type="search" name="q" placeholder="Cari produk atau kode SKU..." aria-label="Cari produk" value="{{ keyword if keyword is defined else '' }}">
+          <kbd>/</kbd>
+        </form>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-button theme-switch" id="themeSwitch" type="button" aria-label="Ganti tema" title="Ganti tema"><i data-lucide="moon"></i></button>
+        <span class="topbar-separator"></span>
+        <div class="user-chip"><div class="avatar">{{ user.name[:1]|upper }}</div><div class="user-meta"><strong>{{ user.name }}</strong><small>Administrator Demo</small></div></div>
+        <form method="post" action="{{ url_for('logout') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="icon-button" type="submit" title="Keluar" aria-label="Keluar"><i data-lucide="log-out"></i></button>
+        </form>
+      </div>
+    </header>
+    <main class="content" id="main-content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="alerts" role="status" aria-live="polite">
+            {% for category, message in messages %}<div class="alert alert-{{ category }}"><i data-lucide="{{ 'circle-check' if category == 'success' else 'alert-circle' }}"></i><span>{{ message }}</span><button type="button" class="alert-close" aria-label="Tutup pesan" data-dismiss-alert><i data-lucide="x"></i></button></div>{% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+      <footer class="page-footer"><span>© {{ now.year }} StockFlow · Built with Python & Flask</span><span>Portfolio Demo v1.0</span></footer>
+    </main>
+  </div>
+</div>
+{% else %}
+<main class="auth-layout">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}<div class="auth-alerts" role="status">{% for category, message in messages %}<div class="alert alert-{{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+  {% endwith %}
+  {% block auth_content %}{% endblock %}
+</main>
+{% endif %}
+</body>
+</html>

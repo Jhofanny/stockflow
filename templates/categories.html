@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="page-heading"><div><div class="eyebrow">INVENTARIS / KATEGORI</div><h1>Kategori Produk</h1><p>Ringkasan jumlah dan nilai barang untuk setiap kelompok produk.</p></div><a href="{{ url_for('product_new') }}" class="btn btn-primary"><i data-lucide="plus"></i> Tambah Produk</a></section>
+{% if categories %}<div class="category-grid">{% for cat in categories %}<a href="{{ url_for('products', category=cat.name) }}" class="panel cat-summary"><div class="cat-icon"><i data-lucide="layers"></i></div><div><strong>{{ cat.name }}</strong><p>{{ cat.products }} produk · {{ cat.stock }} unit</p></div><span class="cat-value">{{ cat.value|rupiah }}</span><i data-lucide="arrow-up-right" class="cat-arrow"></i></a>{% endfor %}</div>{% else %}<div class="panel"><div class="empty-state"><h3>Belum ada kategori</h3><p>Kategori dibuat otomatis dari data produk.</p><a href="{{ url_for('product_new') }}" class="btn btn-primary">Tambah Produk</a></div></div>{% endif %}
+{% endblock %}
